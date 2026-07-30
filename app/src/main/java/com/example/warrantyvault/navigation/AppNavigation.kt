@@ -16,11 +16,17 @@ fun AppNavigation() {
         startDestination = Routes.Home.route)
     {
         composable (Routes.Home.route){
-            HomeScreen()
+            HomeScreen(onAddProductClick = {
+                navController.navigate(Routes.AddProduct.route)
+            })
         }
 
         composable(Routes.AddProduct.route) {
-            AddProductScreen()
+
+            AddProductScreen(onBackClick={},
+                onSaveClick={},
+               onUploadReceipt={},
+                onUploadWarranty={})
         }
 
     }
