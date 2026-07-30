@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.warrantyvault.features.HomeScreen
+import com.example.warrantyvault.navigation.AppNavigation
 import com.example.warrantyvault.ui.theme.WarrantyVaultTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WarrantyVaultTheme {
 
-                HomeScreen()
+                AppNavigation()
             }
         }
     }
