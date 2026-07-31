@@ -725,7 +725,7 @@ fun UploadCard(
                         text = if (imageUri == null)
                             subtitle
                         else
-                            "Receipt uploaded successfully",
+                            "$title uploaded successfully",
                         fontSize = 13.sp,
                         color = Color(0xFF737386)
                     )
@@ -756,7 +756,7 @@ fun UploadCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Upload Receipt",
+                        text =buttonText,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -766,7 +766,7 @@ fun UploadCard(
 
                 AsyncImage(
                     model = imageUri,
-                    contentDescription = "Receipt",
+                    contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(180.dp)
@@ -800,7 +800,7 @@ fun UploadCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Change Receipt",
+                        text = "Change $title",
                         color = buttonColor,
                         fontWeight = FontWeight.SemiBold
                     )
