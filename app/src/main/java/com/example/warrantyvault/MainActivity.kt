@@ -14,7 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.warrantyvault.features.HomeScreen
 import com.example.warrantyvault.navigation.AppNavigation
 import com.example.warrantyvault.ui.theme.WarrantyVaultTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

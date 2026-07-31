@@ -1,11 +1,13 @@
 package com.example.warrantyvault.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.warrantyvault.features.AddProductScreen
 import com.example.warrantyvault.features.HomeScreen
+import com.example.warrantyvault.features.WarrantyViewModel
 
 
 @Composable
@@ -22,9 +24,12 @@ fun AppNavigation() {
         }
 
         composable(Routes.AddProduct.route) {
+            val viewModel: WarrantyViewModel = hiltViewModel()
 
-            AddProductScreen(onBackClick={},
-                onSaveClick={},
+            AddProductScreen(viewModel,onBackClick={},
+                onSaveClick={
+                    viewModel.saveProductInfo()
+                },
                onUploadReceipt={},
                 onUploadWarranty={})
         }
