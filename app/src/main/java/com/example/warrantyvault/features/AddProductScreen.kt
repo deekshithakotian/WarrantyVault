@@ -71,6 +71,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 
@@ -103,6 +104,8 @@ fun AddProductScreen(
     val warrantyImageUri by viewModel.warrantyImage.collectAsState()
 
     var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var showReceiptPreview by remember { mutableStateOf(false)}
+    var showWarrantyPreview by remember { mutableStateOf(false)}
 
     val galleryLauncherReceipt =
         rememberLauncherForActivityResult(
@@ -284,7 +287,7 @@ fun AddProductScreen(
                 cardBackground = Color(0xFFFFF8F0),
                 onClick = viewModel::openReceiptSheet,
                 onImageClick = {
-                    // Open full-screen preview dialog
+                   showReceiptPreview=true
                 }
             )
 
@@ -300,6 +303,14 @@ fun AddProductScreen(
                 }
             )
 
+            ImagePreviewDialog(
+                image = receiptImageUri,
+                showDialog = showReceiptPreview,
+                onDismiss = {
+                    showReceiptPreview = false
+                }
+            )
+
             // Warranty Document
             UploadCard(
                 title = "Warranty Document",
@@ -311,7 +322,7 @@ fun AddProductScreen(
                 cardBackground = Color(0xFFF0F6FF),
                 onClick = viewModel::openWarrantySheet,
                 onImageClick = {
-                    // Open full-screen preview dialog
+                    showWarrantyPreview=true
                 }
             )
 
@@ -327,6 +338,14 @@ fun AddProductScreen(
                 onGalleryClick = {
                     galleryLauncherWarranty.launch("image/*")
 
+                }
+            )
+
+            ImagePreviewDialog(
+                image = warrantyImageUri,
+                showDialog = showWarrantyPreview,
+                onDismiss = {
+                    showWarrantyPreview = false
                 }
             )
 
@@ -851,6 +870,51 @@ fun ImagePickerBottomSheet(
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
+
+
+@Composable
+fun ImagePreviewDialog(
+    image: Uri?,
+    showDialog: Boolean,
+    onDismiss: () -> Unit
+) {
+
+    if (!showDialog || image == null) return
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+
+            Column {
+
+                AsyncImage(
+                    model = image,
+                    contentDescription = "Preview Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp),
+                    contentScale = ContentScale.Fit
+                )
+
+                TextButton(
+                    modifier = Modifier.align(Alignment.End),
+                    onClick = onDismiss
+                ) {
+                    Text("Close")
+                }
+            }
+        }
+    }
+}
+
+
 @Composable
 @Preview(showBackground = true)
 fun AddProductPreview()
