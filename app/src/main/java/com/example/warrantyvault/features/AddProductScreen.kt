@@ -54,6 +54,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import kotlinx.coroutines.flow.update
 
 
 private val BackgroundColor = Color(0xFFF7F7FF)
@@ -83,29 +85,39 @@ private val LightPurple = Color(0xFFF0EBFF)
 @Composable
 fun AddProductScreen(
     viewModel: WarrantyViewModel=hiltViewModel(),
-    onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
     onUploadReceipt: () -> Unit = {},
     onUploadWarranty: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
 
-    val brand by viewModel.brand.collectAsState()
-    val productName by viewModel.productName.collectAsState()
-    val purchaseDate by viewModel.purchaseDate.collectAsState()
-    val showPurchasePicker by viewModel.showPurchaseDatePicker.collectAsState()
-    val warrantyDate by viewModel.warrantyDate.collectAsState()
-    val showWarrantyPicker by viewModel.showWarrantyDatePicker.collectAsState()
-    val notes by viewModel.notes.collectAsState()
-    val showReceiptSheet by viewModel.showReceiptSheet.collectAsState()
-    val showWarrantySheet by viewModel.showWarrantySheet.collectAsState()
-    val receiptImageUri by viewModel.receiptImage.collectAsState()
-    val warrantyImageUri by viewModel.warrantyImage.collectAsState()
 
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var showReceiptPreview by remember { mutableStateOf(false)}
     var showWarrantyPreview by remember { mutableStateOf(false)}
+    val showReceiptSheet by viewModel.showReceiptSheet.collectAsState()
+    val showWarrantySheet by viewModel.showWarrantySheet.collectAsState()
+    val showPurchasePicker by viewModel.showPurchaseDatePicker.collectAsState()
+    val showWarrantyPicker by viewModel.showWarrantyDatePicker.collectAsState()
+
+    val product by viewModel.product.collectAsState()
+
+    val brand =product.brand
+    val productName =product.productName
+    val purchaseDate =product.purchaseDate
+    val warrantyDate = product.warrantyDate
+    val notes =product.notes
+
+    val receiptImageUri = product.receiptImage?.let {
+        Uri.parse(it)
+    }
+
+    val warrantyImageUri = product.warrantyCardImage?.let {
+        Uri.parse(it)
+    }
+
 
     val galleryLauncherReceipt =
         rememberLauncherForActivityResult(
@@ -151,6 +163,13 @@ fun AddProductScreen(
             }
         }
 
+
+    LaunchedEffect(Unit) {
+
+        viewModel.goBackHome.collect {
+            onBackClick()
+        }
+    }
 
 
     Column(
@@ -921,8 +940,9 @@ fun AddProductPreview()
 {
     val viewModel: WarrantyViewModel = hiltViewModel()
 
-    AddProductScreen(viewModel,onBackClick={},
+    AddProductScreen(viewModel,
         onSaveClick={},
+        onBackClick={},
         onUploadReceipt={},
         onUploadWarranty={})
 }

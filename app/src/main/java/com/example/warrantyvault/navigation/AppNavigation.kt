@@ -26,12 +26,16 @@ fun AppNavigation() {
         composable(Routes.AddProduct.route) {
             val viewModel: WarrantyViewModel = hiltViewModel()
 
-            AddProductScreen(viewModel,onBackClick={},
+            AddProductScreen(viewModel,
                 onSaveClick={
                     viewModel.saveProductInfo()
                 },
+                onBackClick={
+                    navController.popBackStack()
+                },
                onUploadReceipt={},
-                onUploadWarranty={})
+                onUploadWarranty={},
+               )
         }
 
     }
