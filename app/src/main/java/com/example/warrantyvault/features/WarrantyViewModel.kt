@@ -7,6 +7,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warrantyvault.common.local.Product
+import com.example.warrantyvault.common.local.helperclass.SyncManager
 import com.example.warrantyvault.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,8 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class WarrantyViewModel @Inject constructor(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private  val syncManager: SyncManager
 ) : ViewModel() {
 
 //    private val _brand =MutableStateFlow("")
@@ -210,6 +212,7 @@ class WarrantyViewModel @Inject constructor(
 
            }
            _goBackHome.emit("go_back_home")
+           syncManager.startProductSync()
 
        }
     }

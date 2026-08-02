@@ -13,8 +13,14 @@ class ProductRepository @Inject constructor(
         productDao.insertProduct(product)
     }
 
-    suspend fun getProducts(): List<Product> {
-        return productDao.getProducts()
+    suspend fun getUnsyncedProducts(): List<Product> {
+        return productDao.getUnSyncedProducts()
+
+    }
+
+
+    suspend fun updateSyncStatus(id: Int, markSynced: Int) {
+        productDao.updateSyncStatus(id, markSynced)
 
     }
 }
