@@ -3,11 +3,16 @@ package com.example.warrantyvault.features
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.warrantyvault.common.local.Product
 import com.example.warrantyvault.common.local.helperclass.SyncManager
+import com.example.warrantyvault.common.model.ApiResponse
+import com.example.warrantyvault.common.model.ApiState
 import com.example.warrantyvault.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +28,7 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import java.io.FileOutputStream
 
 @HiltViewModel
 class WarrantyViewModel @Inject constructor(
@@ -64,13 +70,31 @@ class WarrantyViewModel @Inject constructor(
 
 
 
-
-
     private val _product = MutableStateFlow(Product())
     val product = _product.asStateFlow()
 
     private val _goBackHome= MutableSharedFlow<String>()
     val goBackHome=_goBackHome.asSharedFlow()
+
+    private val _productSaveState = MutableStateFlow<ApiState<ApiResponse<Product>>>(ApiState.Loading)
+    val saveProduct=_productSaveState.asStateFlow()
+
+
+
+    private val _selectedReceiptUri = MutableStateFlow<Uri?>(null)
+    val selectedReceiptUri = _selectedReceiptUri.asStateFlow()
+
+    private val _selectedWarrantyUri = MutableStateFlow<Uri?>(null)
+    val selectedWarrantyUri = _selectedWarrantyUri.asStateFlow()
+
+
+    fun updateReceiptUri(uri: Uri) {
+        _selectedReceiptUri.value = uri
+    }
+
+    fun updateWarrantyUri(uri: Uri) {
+        _selectedWarrantyUri.value = uri
+    }
 
     fun updateProductName(value: String) {
         _product.update {
@@ -116,17 +140,17 @@ class WarrantyViewModel @Inject constructor(
         }
     }
 
-    fun updateReceiptImage(uri: Uri)
+    fun updateReceiptImage(uri: String)
     {
         _product.update {
-            it.copy(receiptImage = uri.toString())
+            it.copy(receiptImage = uri)
         }
     }
 
-    fun updateWarrantyImage(uri:Uri)
+    fun updateWarrantyImage(uri:String)
     {
         _product.update {
-            it.copy(warrantyCardImage = uri.toString())
+            it.copy(warrantyCardImage = uri)
         }
     }
 
@@ -150,6 +174,28 @@ class WarrantyViewModel @Inject constructor(
     fun closeWarrantyDatePicker() {
         showWarrantyDatePicker.value = false
 
+    }
+
+    fun copyImageToInternalStorage(
+        context: Context,
+        uri: Uri
+    ): String {
+
+        val extension = context.contentResolver.getType(uri)
+            ?.substringAfter("/")
+            ?: "jpg"
+
+        val fileName = "${System.currentTimeMillis()}.$extension"
+
+        val file = File(context.filesDir, fileName)
+
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        return file.absolutePath
     }
 
     fun createImageFile(context: Context,title:String): Uri {
@@ -201,20 +247,30 @@ class WarrantyViewModel @Inject constructor(
 
     fun saveProductInfo()
     {
-       viewModelScope.launch {
 
-           withContext(Dispatchers.IO)
-           {
-               _product.update {
-                   it.copy(markSynced = 0)
-               }
-               productRepository.insertProduct(_product.value)
+        _productSaveState.value = ApiState.Loading
 
-           }
-           _goBackHome.emit("go_back_home")
-           syncManager.startProductSync()
+        viewModelScope.launch {
 
-       }
+            try {
+
+                withContext(Dispatchers.IO) {
+                    productRepository.insertProduct(_product.value)
+                }
+
+                _productSaveState.value = ApiState.Success(ApiResponse("Product Saved","success",200,_product.value,null))
+
+                syncManager.startProductSync()
+//            _goBackHome.emit("go_back_home")
+
+
+            } catch (e: Exception) {
+
+                _productSaveState.value =
+                    ApiState.Error(e.message ?: "Unable to save")
+            }
+        }
+
     }
 
 

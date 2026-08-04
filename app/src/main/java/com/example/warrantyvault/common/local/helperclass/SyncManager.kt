@@ -6,10 +6,12 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class SyncManager @Inject constructor(
-    private val context: Context,
+    @ApplicationContext
+    private val context: Context
 ) {
 
     fun startProductSync() {

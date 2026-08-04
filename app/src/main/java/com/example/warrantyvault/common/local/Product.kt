@@ -22,9 +22,9 @@ data class Product(
 
     val notes: String = "",
 
-    val receiptImage: String? = null,
+    var receiptImage: String? = null,
 
-    val warrantyCardImage: String? = null,
+    var warrantyCardImage: String? = null,
 
     val productImage: String? = null,
 

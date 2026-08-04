@@ -1,6 +1,7 @@
 package com.example.warrantyvault.features
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -75,6 +76,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.warrantyvault.common.model.ApiState
 import kotlinx.coroutines.flow.update
 
 
@@ -110,14 +112,16 @@ fun AddProductScreen(
     val warrantyDate = product.warrantyDate
     val notes =product.notes
 
-    val receiptImageUri = product.receiptImage?.let {
-        Uri.parse(it)
-    }
-
-    val warrantyImageUri = product.warrantyCardImage?.let {
-        Uri.parse(it)
-    }
-
+//    val receiptImageUri = product.receiptImage?.let {
+//        Uri.parse(it)
+//    }
+//
+//    val warrantyImageUri = product.warrantyCardImage?.let {
+//        Uri.parse(it)
+//    }
+    val saveProduct by viewModel.saveProduct.collectAsState()
+    val selectedReceiptUri by viewModel.selectedReceiptUri.collectAsState()
+    val selectedWarrantyUri by viewModel.selectedWarrantyUri.collectAsState()
 
     val galleryLauncherReceipt =
         rememberLauncherForActivityResult(
@@ -125,7 +129,10 @@ fun AddProductScreen(
         ) { uri ->
 
             uri?.let {
-                viewModel.updateReceiptImage(it)
+                viewModel.updateReceiptUri(it)
+
+                val localPath=viewModel.copyImageToInternalStorage(context,it)
+                viewModel.updateReceiptImage(localPath)
             }
         }
 
@@ -135,7 +142,10 @@ fun AddProductScreen(
         ) { success ->
             if (success) {
                 photoUri?.let {
-                    viewModel.updateReceiptImage(it)
+                    viewModel.updateReceiptUri(it)
+
+                    val localPath=viewModel.copyImageToInternalStorage(context,it)
+                    viewModel.updateReceiptImage(localPath)
                 }
             }
         }
@@ -148,7 +158,11 @@ fun AddProductScreen(
         ) { uri ->
 
             uri?.let {
-                viewModel.updateWarrantyImage(it)
+                viewModel.updateWarrantyUri(it)
+
+
+                val localPath=viewModel.copyImageToInternalStorage(context,it)
+                viewModel.updateWarrantyImage(localPath)
             }
         }
 
@@ -158,16 +172,54 @@ fun AddProductScreen(
         ) { success ->
             if(success){
                 photoUri?.let {
-                    viewModel.updateWarrantyImage(it)
+                    viewModel.updateWarrantyUri(it)
+
+                    val localPath=viewModel.copyImageToInternalStorage(context,it)
+                    viewModel.updateWarrantyImage(localPath)
                 }
             }
         }
 
+//
+//    LaunchedEffect(Unit) {
+//
+//        viewModel.goBackHome.collect {
+//            onBackClick()
+//        }
+//    }
 
-    LaunchedEffect(Unit) {
 
-        viewModel.goBackHome.collect {
-            onBackClick()
+    LaunchedEffect(saveProduct) {
+        when(saveProduct)
+        {
+            is ApiState.Loading->{
+
+
+            }
+
+            is ApiState.Success-> {
+
+                Toast.makeText(
+                    context,
+                    (saveProduct as ApiState.Success).data.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+                onBackClick()
+            }
+            is ApiState.Error->{
+
+                Toast.makeText(
+                    context,
+                    (saveProduct as ApiState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
+            else->{
+
+            }
+
+
         }
     }
 
@@ -300,7 +352,7 @@ fun AddProductScreen(
                 title = "Purchase Receipt",
                 subtitle = "Upload receipt for this product",
                 buttonText = "Upload Receipt",
-                imageUri=receiptImageUri,
+                imageUri=selectedReceiptUri,
                 icon = Icons.Default.ReceiptLong,
                 buttonColor = Color(0xFFFF8A00),
                 cardBackground = Color(0xFFFFF8F0),
@@ -323,7 +375,7 @@ fun AddProductScreen(
             )
 
             ImagePreviewDialog(
-                image = receiptImageUri,
+                image = selectedReceiptUri,
                 showDialog = showReceiptPreview,
                 onDismiss = {
                     showReceiptPreview = false
@@ -334,7 +386,7 @@ fun AddProductScreen(
             UploadCard(
                 title = "Warranty Document",
                 subtitle = "Upload warranty document",
-                imageUri=warrantyImageUri,
+                imageUri=selectedWarrantyUri,
                 buttonText = "Upload Document",
                 icon = Icons.Default.Description,
                 buttonColor = Color(0xFF1976D2),
@@ -361,7 +413,7 @@ fun AddProductScreen(
             )
 
             ImagePreviewDialog(
-                image = warrantyImageUri,
+                image = selectedWarrantyUri,
                 showDialog = showWarrantyPreview,
                 onDismiss = {
                     showWarrantyPreview = false
