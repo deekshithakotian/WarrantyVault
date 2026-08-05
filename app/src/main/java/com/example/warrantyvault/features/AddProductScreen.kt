@@ -198,8 +198,10 @@ fun AddProductScreen(
                     (saveProduct as ApiState.Success).data.message,
                     Toast.LENGTH_SHORT
                 ).show()
-                onBackClick()
+
                 viewModel.getAllProducts()
+
+                onBackClick()
 
             }
             is ApiState.Error->{

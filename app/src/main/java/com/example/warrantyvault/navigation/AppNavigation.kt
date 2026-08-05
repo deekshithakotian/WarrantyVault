@@ -14,12 +14,14 @@ import com.example.warrantyvault.features.WarrantyViewModel
 fun AppNavigation() {
 
     val navController = rememberNavController()
+    val viewModel: WarrantyViewModel = hiltViewModel()
+
     NavHost(navController=navController,
         startDestination = Routes.Home.route)
     {
 
         composable (Routes.Home.route){
-            val viewModel: WarrantyViewModel = hiltViewModel()
+//            val viewModel: WarrantyViewModel = hiltViewModel()
 
             HomeScreen(viewModel=viewModel,
             onAddProductClick = {
@@ -28,7 +30,7 @@ fun AppNavigation() {
         }
 
         composable(Routes.AddProduct.route) {
-            val viewModel: WarrantyViewModel = hiltViewModel()
+//            val viewModel: WarrantyViewModel = hiltViewModel()
 
             AddProductScreen(viewModel,
                 onSaveClick={
