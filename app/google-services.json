@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1022844912063",
+    "project_id": "warrantyvault-aa469",
+    "storage_bucket": "warrantyvault-aa469.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022844912063:android:81e664df6cd519b6f9610a",
+        "android_client_info": {
+          "package_name": "com.example.warrantyvault"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMBF_Ci7Cjwxurdn6PVgxeGET_KYbd7GA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

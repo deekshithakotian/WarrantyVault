@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 
 }
 
@@ -90,5 +91,8 @@ dependencies {
     implementation(libs.okhttp.logging)
 
     coreLibraryDesugaring(libs.desugar.jdk)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
 }

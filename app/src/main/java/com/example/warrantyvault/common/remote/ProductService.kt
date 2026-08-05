@@ -1,5 +1,6 @@
 package com.example.warrantyvault.common.remote
 
+import com.example.warrantyvault.common.firebase.FcmTokenRequest
 import com.example.warrantyvault.common.local.Product
 import com.example.warrantyvault.common.model.ApiResponse
 import com.example.warrantyvault.common.model.PresignedRequest
@@ -19,6 +20,6 @@ interface ProductService {
     @POST("generate-uri/")
     suspend fun generateUri(@Body fileName: PresignedRequest): PresignedResponse
 
-    @PUT
-    suspend fun uploadImage(@Url uploadUrl: String, @Body body: RequestBody): Response<Unit>
+    @POST("save-fcm-token/")
+    suspend fun saveFcmToken(@Body request: FcmTokenRequest): Response<ApiResponse<String>>
 }

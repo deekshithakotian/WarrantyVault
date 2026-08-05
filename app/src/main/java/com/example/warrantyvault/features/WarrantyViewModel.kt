@@ -353,4 +353,11 @@ class WarrantyViewModel @Inject constructor(
     }
 
 
+    fun saveFcmToken(token: String) {
+        viewModelScope.launch {
+            productRepository.saveFcmToken(token)
+        }
+    }
+
+
 }

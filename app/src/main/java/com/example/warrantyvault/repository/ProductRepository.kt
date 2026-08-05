@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.work.ListenableWorker
+import com.example.warrantyvault.common.firebase.FcmTokenRequest
 import com.example.warrantyvault.common.local.Product
 import com.example.warrantyvault.common.local.ProductDao
 import com.example.warrantyvault.common.model.ApiResponse
@@ -211,6 +212,24 @@ class ProductRepository @Inject constructor(
 
         } catch (e: Exception) {
             ApiState.Error(e.localizedMessage ?: "Unknown Error")
+        }
+    }
+
+
+    suspend fun saveFcmToken(token: String): ApiState<ApiResponse<String>> {
+
+        return try {
+
+            val response = productSerivce.saveFcmToken(FcmTokenRequest(token))
+
+            if (response.isSuccessful) {
+                ApiState.Success(response.body()!!)
+            } else {
+                ApiState.Error(response.message())
+            }
+
+        } catch (e: Exception) {
+            ApiState.Error(e.message ?: "Unknown Error")
         }
     }
 }
