@@ -112,13 +112,7 @@ fun AddProductScreen(
     val warrantyDate = product.warrantyDate
     val notes =product.notes
 
-//    val receiptImageUri = product.receiptImage?.let {
-//        Uri.parse(it)
-//    }
-//
-//    val warrantyImageUri = product.warrantyCardImage?.let {
-//        Uri.parse(it)
-//    }
+
     val saveProduct by viewModel.saveProduct.collectAsState()
     val selectedReceiptUri by viewModel.selectedReceiptUri.collectAsState()
     val selectedWarrantyUri by viewModel.selectedWarrantyUri.collectAsState()
@@ -205,6 +199,8 @@ fun AddProductScreen(
                     Toast.LENGTH_SHORT
                 ).show()
                 onBackClick()
+                viewModel.getAllProducts()
+
             }
             is ApiState.Error->{
 

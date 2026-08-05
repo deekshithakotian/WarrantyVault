@@ -17,8 +17,12 @@ fun AppNavigation() {
     NavHost(navController=navController,
         startDestination = Routes.Home.route)
     {
+
         composable (Routes.Home.route){
-            HomeScreen(onAddProductClick = {
+            val viewModel: WarrantyViewModel = hiltViewModel()
+
+            HomeScreen(viewModel=viewModel,
+            onAddProductClick = {
                 navController.navigate(Routes.AddProduct.route)
             })
         }

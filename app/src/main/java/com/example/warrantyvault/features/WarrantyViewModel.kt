@@ -2,7 +2,9 @@ package com.example.warrantyvault.features
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,11 +15,13 @@ import com.example.warrantyvault.common.local.Product
 import com.example.warrantyvault.common.local.helperclass.SyncManager
 import com.example.warrantyvault.common.model.ApiResponse
 import com.example.warrantyvault.common.model.ApiState
+import com.example.warrantyvault.common.model.DashboardUiState
 import com.example.warrantyvault.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,6 +33,9 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import java.io.FileOutputStream
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @HiltViewModel
 class WarrantyViewModel @Inject constructor(
@@ -87,6 +94,20 @@ class WarrantyViewModel @Inject constructor(
     private val _selectedWarrantyUri = MutableStateFlow<Uri?>(null)
     val selectedWarrantyUri = _selectedWarrantyUri.asStateFlow()
 
+
+    private val _productsList=MutableStateFlow<List<Product>>(emptyList())
+    val productsList=_productsList.asStateFlow()
+
+    private val _listProductResponse=MutableSharedFlow<String>()
+    val listProductResponse= _listProductResponse.asSharedFlow()
+
+    private val _dashboardState = MutableStateFlow(DashboardUiState())
+    val dashboardState = _dashboardState.asStateFlow()
+
+
+    init {
+        getAllProducts()
+    }
 
     fun updateReceiptUri(uri: Uri) {
         _selectedReceiptUri.value = uri
@@ -243,7 +264,28 @@ class WarrantyViewModel @Inject constructor(
     }
 
 
+    fun getAllProducts() {
 
+        viewModelScope.launch(Dispatchers.IO) {
+
+                when (val products=productRepository.getAllProducts()) {
+                    is ApiState.Success -> {
+                        _productsList.value = (products as ApiState.Success).data
+                        updateDashBoardState(_productsList.value)
+
+                    }
+
+                    is ApiState.Error -> {
+                        _listProductResponse.emit(products.message)
+                    }
+
+                    else -> Unit
+
+
+                }
+
+        }
+    }
 
     fun saveProductInfo()
     {
@@ -269,6 +311,43 @@ class WarrantyViewModel @Inject constructor(
                 _productSaveState.value =
                     ApiState.Error(e.message ?: "Unable to save")
             }
+        }
+
+    }
+
+
+    fun updateDashBoardState(product:List<Product>)
+    {
+        val today= LocalDate.now()
+
+        val expired=product.count {
+            val warrantyDate = LocalDate.parse(
+                it.warrantyDate,
+                DateTimeFormatter.ofPattern("dd MMM yyyy")
+            )
+            warrantyDate.isBefore(today)
+        }
+
+
+        val expiringSoon=product.count{
+            val warrantyDate = LocalDate.parse(
+                it.warrantyDate,
+                DateTimeFormatter.ofPattern("dd MMM yyyy")
+            )
+            !warrantyDate.isBefore(today) &&
+             ChronoUnit.DAYS.between(today, warrantyDate) <= 30
+
+        }
+
+        val active=product.size-expired
+
+        _dashboardState.update {
+            it.copy(
+                totalProducts = product.size,
+                activeProducts = active,
+                expiringSoon = expiringSoon,
+                expiredProducts = expired
+            )
         }
 
     }

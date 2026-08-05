@@ -17,6 +17,10 @@ interface ProductDao {
     @Query("select * from products where markSynced='1'")
     suspend fun getSyncedProducts(): List<Product>
 
+    @Query("SELECT * FROM products")
+    suspend fun getAllProducts(): List<Product>
+
+
     @Query("UPDATE products SET markSynced=:markSynced where id=:id")
     suspend fun updateSyncStatus(id:Int,markSynced:Int)
 }

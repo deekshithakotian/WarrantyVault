@@ -33,6 +33,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "21"
@@ -87,4 +88,7 @@ dependencies {
     implementation(libs.retrofit.gson)
 
     implementation(libs.okhttp.logging)
+
+    coreLibraryDesugaring(libs.desugar.jdk)
+
 }

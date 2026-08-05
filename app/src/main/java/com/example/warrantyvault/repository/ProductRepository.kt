@@ -36,6 +36,15 @@ class ProductRepository @Inject constructor(
 
     }
 
+    suspend fun getAllProducts(): ApiState<List<Product>>{
+        return try {
+            val products = productDao.getAllProducts()
+            ApiState.Success(products)
+        } catch (e: Exception) {
+            ApiState.Error(e.localizedMessage ?: "Unknown Error")
+        }
+    }
+
     suspend fun updateSyncStatus(id: Int, markSynced: Int) {
         productDao.updateSyncStatus(id, markSynced)
 

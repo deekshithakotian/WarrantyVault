@@ -1,5 +1,6 @@
 package com.example.warrantyvault.features
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,14 +40,33 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.warrantyvault.common.model.DashboardUiState
 
 @Composable
-fun HomeScreen(onAddProductClick:()->Unit)
+fun HomeScreen(viewModel: WarrantyViewModel= hiltViewModel(),
+               onAddProductClick:()->Unit)
 {
+    val context= LocalContext.current
+    val dashBoardState by viewModel.dashboardState.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        viewModel.listProductResponse.collect {
+            if(it.isNotEmpty())
+            {
+                Toast.makeText(context,it,Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -92,7 +112,7 @@ fun HomeScreen(onAddProductClick:()->Unit)
 
             item {
 
-                WarrantySummaryCards()
+                WarrantySummaryCards(dashBoardState=dashBoardState)
             }
         }
     }
@@ -173,7 +193,7 @@ fun TopCard()
 }
 
 @Composable
-fun WarrantySummaryCards() {
+fun WarrantySummaryCards(dashBoardState: DashboardUiState) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -188,7 +208,7 @@ fun WarrantySummaryCards() {
             SummaryCard(
                 modifier = Modifier.weight(1f),
                 title="Total Products",
-                value = "24",
+                value = dashBoardState.totalProducts.toString(),
                 label = "Products",
                 icon = Icons.Default.Inventory,
                 color=Color(0xFF7B61FF)
@@ -197,7 +217,7 @@ fun WarrantySummaryCards() {
             SummaryCard(
                 modifier = Modifier.weight(1f),
                 title="Active Warranties",
-                value = "18",
+                value = dashBoardState.activeProducts.toString(),
                 label = "Active",
                 icon = Icons.Default.Verified,
                 color=Color(0xFFE65100)
@@ -211,9 +231,9 @@ fun WarrantySummaryCards() {
 
             SummaryCard(
                 modifier = Modifier.weight(1f),
-                title="Expiring Soon",
-                value = "3",
-                label = "Expiring Soon",
+                title="Expiring",
+                value = dashBoardState.expiringSoon.toString(),
+                label ="Expiring",
                 icon = Icons.Default.Warning,
                 color=Color(0xFFC62828)
             )
@@ -221,7 +241,7 @@ fun WarrantySummaryCards() {
             SummaryCard(
                 modifier = Modifier.weight(1f),
                 title="Expired",
-                value = "6",
+                value = dashBoardState.expiredProducts.toString(),
                 label = "Expired",
                 icon = Icons.Default.ErrorOutline,
                 color=Color(0xFF6A1B9A)
@@ -308,7 +328,10 @@ fun SummaryCard(
 @Preview(showBackground = true)
 fun HomeScreenPreview()
 {
-    HomeScreen(onAddProductClick = {})
+    val viewModel: WarrantyViewModel = hiltViewModel()
+
+    HomeScreen(viewModel,
+        onAddProductClick = {})
 }
 
 
