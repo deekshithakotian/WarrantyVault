@@ -16,8 +16,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitHelperClass {
-
+// emulator-same
 //    private const val BASE_URL = "http://10.0.2.2:8000/api/"
+    //phone-http://0.0.0.0:8000/
+    //backend warrantyvaultBackend
     private const val BASE_URL = "http://172.20.10.3:8000/api/"
 
 
