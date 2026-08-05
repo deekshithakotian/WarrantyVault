@@ -270,7 +270,7 @@ class WarrantyViewModel @Inject constructor(
 
                 when (val products=productRepository.getAllProducts()) {
                     is ApiState.Success -> {
-                        _productsList.value = (products as ApiState.Success).data
+                        _productsList.value = products.data
                         updateDashBoardState(_productsList.value)
 
                     }
