@@ -41,7 +41,6 @@ class WarrantyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-
     fun generateNotification(title: String, message: String)
     {
         val intent=Intent(this, MainActivity::class.java)
