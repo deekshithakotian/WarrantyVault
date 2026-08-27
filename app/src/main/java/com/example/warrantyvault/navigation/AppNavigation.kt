@@ -1,12 +1,15 @@
 package com.example.warrantyvault.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.warrantyvault.features.AddProductScreen
 import com.example.warrantyvault.features.HomeScreen
+import com.example.warrantyvault.features.LoginScreen
+import com.example.warrantyvault.features.LoginViewModel
 import com.example.warrantyvault.features.WarrantyViewModel
 
 
@@ -17,8 +20,16 @@ fun AppNavigation() {
     val viewModel: WarrantyViewModel = hiltViewModel()
 
     NavHost(navController=navController,
-        startDestination = Routes.Home.route)
+        startDestination = Routes.Login.route)
     {
+
+        composable(Routes.Login.route)
+        {
+            val viewModel: LoginViewModel=hiltViewModel()
+            LoginScreen(viewModel,onSuccessLogin={
+                navController.navigate(Routes.Home.route)
+            })
+        }
 
         composable (Routes.Home.route){
 //            val viewModel: WarrantyViewModel = hiltViewModel()
@@ -48,3 +59,4 @@ fun AppNavigation() {
 
 
 }
+
