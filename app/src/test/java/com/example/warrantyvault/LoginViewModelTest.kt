@@ -55,5 +55,4 @@ class LoginViewModelTest {
         assertEquals("Password must be at least 6 characters",viewModel.errorState.value)
     }
 
-
 }
