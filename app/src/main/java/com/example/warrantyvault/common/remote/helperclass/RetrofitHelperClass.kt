@@ -1,6 +1,7 @@
 package com.example.warrantyvault.common.remote.helperclass
 
 import android.R.attr.level
+import com.example.warrantyvault.common.remote.LoginService
 import com.example.warrantyvault.common.remote.ProductService
 import dagger.Module
 import dagger.Provides
@@ -17,10 +18,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RetrofitHelperClass {
 // emulator-same
-//    private const val BASE_URL = "http://10.0.2.2:8000/api/"
+    private const val BASE_URL = "http://10.0.2.2:8000/api/"
     //phone-http://0.0.0.0:8000/
     //backend warrantyvaultBackend
-    private const val BASE_URL = "http://172.20.10.3:8000/api/"
+//    private const val BASE_URL = "http://172.20.10.3:8000/api/"
 
 
     @Provides
@@ -63,5 +64,13 @@ object RetrofitHelperClass {
         retrofit: Retrofit
     ): ProductService {
         return retrofit.create(ProductService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoginService(
+        retrofit: Retrofit
+    ): LoginService {
+        return retrofit.create(LoginService::class.java)
     }
 }
